@@ -1,4 +1,8 @@
+//GLOBAL VARIABLES
+
 var drawLines = false;
+
+
 function Box( image, parent, x, y, w, h, depth )
 {
 	this.parent = parent;
@@ -96,14 +100,7 @@ Box.prototype.draw = function( ctx )
 {
 	ctx.fillStyle = this.color;
 	ctx.fillRect( this.x, this.y, this.w, this.h );	
-	
-	//Debug code, remove
-	
-	//ctx.stroke();
-	//ctx.fillStyle = "#000";
-	//ctx.fillText(Math.floor(this.error), this.x+5, this.y+15 );
-	
-	
+
 	if( drawLines )
 	{
 		ctx.beginPath();
@@ -111,6 +108,14 @@ Box.prototype.draw = function( ctx )
 		ctx.strokeStyle= "black";
 		ctx.rect( this.x, this.y, this.w, this.h );
 		ctx.stroke();
+	}
+	
+	//Debug code, remove
+	if( DEBUG_MODE )
+	{
+		ctx.stroke();
+		ctx.fillStyle = "#000";
+		ctx.fillText(Math.floor(this.error), this.x+5, this.y+15 );
 	}
 };
 

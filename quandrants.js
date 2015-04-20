@@ -1,19 +1,30 @@
 //GLOBAL VARIABLES
-var ITERATIONS = 100;
-var MAX_DEPTH = 6;
-var image = new Image();
-	
-function quandrants(canvas,cWidth ,cHeight)
+var ITERATIONS = 512;
+var MAX_DEPTH = 5;
+var DEBUG_MODE = false;
+
+//The Image data
+var g_image = new Image();
+var g_imageData; //will be set on g_image.OnLoad
+
+//Canvas used for drawing the actual image
+var canvas;
+var ctx;
+			
+//Buffer
+var bufferCanvas = document.createElement('canvas');
+var buffer = bufferCanvas.getContext('2d');
+
+
+function quandrants( passed_canvas,cWidth ,cHeight)
 {
-	ctx = canvas.getContext('2d');
+	//Initialize the drawing canvas and context for main canvas and buffer
+	canvas = passed_canvas;
+	ctx = canvas.getContext("2d");
+	bufferCanvas.width 	= canvas.width;
+	bufferCanvas.height = canvas.height;
 	
-	//the map buffer
-	var bufferCanvas = document.createElement('canvas');
-	bufferCanvas.width = cWidth;
-	bufferCanvas.height = cHeight;
-	var buffer = bufferCanvas.getContext('2d');
-	
-	//private var
+	// Member variables
 	var intervalID	= -1;
 	var framerate 	= 30; //60
 	var isRunning 	= false;
@@ -22,25 +33,23 @@ function quandrants(canvas,cWidth ,cHeight)
 	var root;
 	var drawNode;
 	var hist;
-		
-	//public var
-	this.canvasWidth	= cWidth;
-	this.canvasHeight 	= cHeight;
 	
 	this.run = function( img )
 	{	
-		image = new Image();
-		image.onload = function()
-		{		
+		g_image = new Image();
+		g_image.onload = function()
+		{	
+			g_imageData = ctx.getImageData(0,0,cWidth,cHeight);
+			console.log( g_imageData);
 			isRunning = true;
 			
-			root = new Box( image, {},  0, 0, cWidth, cHeight, 0 );
+			root = new Box( g_image, {},  0, 0, cWidth, cHeight, 0 );
 			drawNode = root;
 			boxes.push( root );
 			draw();
 			intervalID = setInterval( running, 1000/ framerate );				
 		}
-		image.src = img ;
+		g_image.src = img ;
 		
 	}
 	
@@ -97,38 +106,6 @@ function quandrants(canvas,cWidth ,cHeight)
 		drawNode = last;
 		boxes = leaves;
 		
-		/*
-		for( var i = 0, boxlen = boxes.length; i < boxlen; i++ )
-		{
-			if( boxes[i].error >= largestError && boxes[i].depth < MAX_DEPTH )
-			{
-				index = i;
-				largestError = boxes[i].error;
-				if( largestError < 10 )
-				{
-					index = -1;
-				}
-			}
-			
-		}
-			
-		if( index !== -1 )
-		{
-			boxes[index].divide();
-			var children = boxes[index].getLeafNodes( MAX_DEPTH );
-			boxes.splice( index, 1 );
-			for( i = 0, l = children.length; i < l; i++ )
-			{
-				boxes.splice( index, 0, children[i] );
-			}
-			////divide and add the children
-			//boxes[index].divide();
-			//var children = boxes[index].getLeafNodes( MAX_DEPTH );
-			//var args = [index,1].concat(boxes[index].getLeafNodes( MAX_DEPTH ));			
-			//Array.prototype.splice.apply(boxes, args);
-			//
-		}
-		*/
 		ITERATIONS -= 1;		
 	};
 	
@@ -164,12 +141,6 @@ function quandrants(canvas,cWidth ,cHeight)
 		{
 			drawNode.children[i].draw(ctx);
 		}
-		/*
-		for( var i = 0; i < boxes.length; i++ )
-		{
-			boxes[i].draw(ctx);
-		}*/
-		
 	}
 	
 	/**

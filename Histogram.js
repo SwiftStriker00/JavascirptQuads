@@ -1,13 +1,11 @@
+
+
 function Histogram( image, x, y, w, h )
-{
+{	
 	var COLOR_RANGE = 256;
 	var r_offset = 0, g_offset = 1, b_offset = 2;
 	
 	//the map buffer
-	var bufferCanvas 	= document.createElement('canvas');
-	bufferCanvas.width 	= canvas.width;
-	bufferCanvas.height = canvas.height;
-	var buffer = bufferCanvas.getContext('2d');
 	var imgData;
 	
 	//Histogram Channels
@@ -48,10 +46,16 @@ function Histogram( image, x, y, w, h )
 		}
 	}
 	
-	function newFilledArray(length, val) {
+	/**
+	* 
+	**/
+	function newFilledArray(length, val) 
+	{
 		var array = [];
 		var i = 0;
-		while (i < length) {
+		
+		while (i < length) 
+		{
 			array[i++] = val;
 		}
 		return array;
@@ -90,6 +94,8 @@ function Histogram( image, x, y, w, h )
 		var rColor = weightedAverage( r );
 		var gColor = weightedAverage( g );
 		var bColor = weightedAverage( b );
+		
+		//standard NTSC conversion formula
 		var error = rColor.error * 0.2989 + gColor.error * 0.5870 + bColor.error * 0.1140;
 		var color = {
 			r: rColor.value,
