@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<script type="text/javascript" src="quandrants.js"></script>
+		<script type="text/javascript" src="Box.js"></script>
+		<script type="text/javascript" src="Histogram.js"></script>
+	</head>
+	<body>
+		<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
+			<p>Your browser doesn't support canvas.</p>
+		</canvas>
+		
+		<img src="fb.jpg" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;" />
+		
+		<script>
+		
+			var canvas = document.getElementById("canvas");
+			var ctx = canvas.getContext("2d");
+			var quads = new quandrants( canvas, canvas.width, canvas.height);
+			quads.run("Mario.jpg"); //fb.jpg
+						
+			canvas.oncontextmenu = function (e) {
+				e.preventDefault();
+			};	
+			
+			function log( str )
+			{
+				console.log( str );
+			};
+			
+			function stop()
+			{
+				quads.stop();
+				console.log( "Program Halted");
+			};
+			
+		</script>
+	</body>
+</html>
