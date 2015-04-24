@@ -1,7 +1,11 @@
 //GLOBAL VARIABLES
-var ITERATIONS = 512;
-var MAX_DEPTH = 5;
+var ITERATIONS = 1000;
+var MAX_DEPTH = 7;
+
+var ERROR_RATE = .5;
 var DEBUG_MODE = false;
+
+
 
 //The Image data
 var g_image = new Image();
@@ -26,7 +30,7 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 	
 	// Member variables
 	var intervalID	= -1;
-	var framerate 	= 30; //60
+	var framerate 	= 20; //60
 	var isRunning 	= false;
 
 	var boxes = [];
@@ -34,7 +38,12 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 	var drawNode;
 	var hist;
 	
-	this.run = function( img )
+	
+	var previousError = -1;
+	var error = 0;
+	var errorSum;
+	
+	this.initialize = function( img )
 	{	
 		g_image = new Image();
 		g_image.onload = function()
@@ -44,13 +53,29 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 			isRunning = true;
 			
 			root = new Box( g_image, {},  0, 0, cWidth, cHeight, 0 );
+			errorSum = root.error * root.area();
 			drawNode = root;
 			boxes.push( root );
-			draw();
-			intervalID = setInterval( running, 1000/ framerate );				
+			draw();			
 		}
 		g_image.src = img ;
 		
+	}
+	
+	this.play = function()
+	{
+		isRunning = true;
+		intervalID = setInterval( running, 1000/ framerate );
+	}
+	
+	this.step = function()
+	{
+		isRunning = true;
+		if ( ITERATIONS <= 0  )
+		{
+			ITERATIONS = 1;
+		}
+		running();
 	}
 	
 	/**
@@ -79,11 +104,12 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 	**/
 	function errorCompareTo( a, b )
 	{
-		if( a.error < b.error )
+
+		if( a.score < b.score )
 		{
 			return -1;
 		}
-		if( a.error > b.error )
+		if( a.score > b.score)
 		{
 			return 1;
 		}
@@ -98,16 +124,37 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 		var index =  -1;
 		var largestError = 0;
 		
+		error = averageErrorOfQuad( drawNode, errorSum );
+		
+		console.log("prev: " + previousError + "error: " + error);
+		if( previousError == -1 || previousError - error > ERROR_RATE )
+			previousError = error;
+		
 		var leaves = root.getAllLeafNodes( [], MAX_DEPTH );
 		leaves.sort( errorCompareTo );
-		console.log( leaves );
-		var last = leaves[leaves.length-1];
-		last.divide();
+		var last = leaves[0];// leaves[leaves.length-1];
+		if( last.error > 0 )
+		{
+			last.divide();
+			errorSum -= last.error * last.area();
+			var kids = last.getLeafNodes();
+			for( var child = 0; child < kids.length; child++ )
+			{
+				errorSum += kids[child].error + kids[child].area();
+			}
+		}
+		
+		
 		drawNode = last;
 		boxes = leaves;
 		
 		ITERATIONS -= 1;		
 	};
+	
+	function averageErrorOfQuad( quad, errorsum )
+	{
+		return errorsum / quad.area();
+	}
 	
 	function getBoxWithLargestError( box )
 	{
