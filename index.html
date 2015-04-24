@@ -3,20 +3,54 @@
 		<script type="text/javascript" src="quandrants.js"></script>
 		<script type="text/javascript" src="Box.js"></script>
 		<script type="text/javascript" src="Histogram.js"></script>
+		
 	</head>
 	<body>
-		<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
-			<p>Your browser doesn't support canvas.</p>
-		</canvas>
 		
-		<img src="fb.jpg" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;" />
+		<form>
+			<span>load image</span>
+			<input type="text" value="" id="imagename"/>
+			<input type="button" id="btn" value="GO" />
+		</form>
+		
+	
+		<div id="buttons">
+			<button id="playButton"  onclick="play()">Play</button>
+			<button id="pauseButton" onclick="step()">Step</button>
+			<button id="stopButton"  onclick="stop()">Stop</button>
+		</div>
+		
+		<div id="display">
+			<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
+				<p>Your browser doesn't support canvas.</p>
+			</canvas>
+			
+			<img id="refpix" src="fb.jpg" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;" /> //Mario.jpg
+		</div>
+		
+		<script type="text/javascript">
+			
+			document.getElementById('btn').onclick = function() 
+			{
+				var val = document.getElementById('imagename').value,
+					src = val;            
+				var pix = document.getElementById('refpix');
+				
+				pix.onload = function()
+				{
+					quads.initialize( picture.src );
+				}
+				pix.src = src;
+				
+			}
+		</script>
 		
 		<script>
-		
+			var picture = document.getElementById('refpix');
 			var canvas = document.getElementById("canvas");
 			var ctx = canvas.getContext("2d");
 			var quads = new quandrants( canvas, canvas.width, canvas.height);
-			quads.run("fb.jpg"); //fb.jpg
+			quads.initialize( picture.src ); //fb.jpg
 						
 			canvas.oncontextmenu = function (e) {
 				e.preventDefault();
@@ -27,11 +61,24 @@
 				console.log( str );
 			};
 			
+			function play()
+			{
+				console.log( "Program Started");
+				quads.play();
+				
+			};
+			
 			function stop()
 			{
 				quads.stop();
 				console.log( "Program Halted");
 			};
+			
+			function step()
+			{
+				quads.step();
+				console.log( "Program Stepped");
+			}
 			
 		</script>
 	</body>

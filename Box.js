@@ -1,7 +1,6 @@
 //GLOBAL VARIABLES
-
+var AREA_POWER = 0.25;
 var drawLines = false;
-
 
 function Box( image, parent, x, y, w, h, depth )
 {
@@ -15,6 +14,7 @@ function Box( image, parent, x, y, w, h, depth )
 	this.children = [];
 	this.hist = new Histogram( image, x, y, w, h );		
 	this.setColor( this.hist.averageColor() );
+	this.score = -this.error * Math.pow( this.area(), AREA_POWER );
 };
 
 /**
@@ -81,7 +81,8 @@ Box.prototype.getLeafNodes = function( depth )
 * Generate children nodes for this box
 **/
 Box.prototype.divide = function()
-{		
+{	
+	
 	var w2 = this.w / 2;
 	var h2 = this.h / 2;
 
@@ -115,7 +116,7 @@ Box.prototype.draw = function( ctx )
 	{
 		ctx.stroke();
 		ctx.fillStyle = "#000";
-		ctx.fillText(Math.floor(this.error), this.x+5, this.y+15 );
+		ctx.fillText("e:" + Math.floor(this.error), this.x+5, this.y+15 );
 	}
 };
 
@@ -126,7 +127,7 @@ Box.prototype.setColor = function( c )
 {
 	this.color = "rgb("+Math.floor(c.r)+","+Math.floor(c.g)+","+Math.floor(c.b)+")";
 	this.error = c.e;
-}
+};
 
 /**
 * returns the area of the box
@@ -134,4 +135,4 @@ Box.prototype.setColor = function( c )
 Box.prototype.area = function()
 {
 	return this.w * this.h;
-}
+};
