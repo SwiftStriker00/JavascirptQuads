@@ -1,9 +1,8 @@
 
-
 function Histogram( image, x, y, w, h )
 {	
 	var COLOR_RANGE = 256;
-	var r_offset = 0, g_offset = 1, b_offset = 2;
+	var r_offset = 0, g_offset = 1, b_offset = 2, a_offset = 3;
 	
 	//the map buffer
 	var imgData;
@@ -17,6 +16,8 @@ function Histogram( image, x, y, w, h )
 	/**
 	* Builds the Histogram from the given image data
 	**/
+
+	
 	function buildHist()
 	{
 		//first initialize r, g, and b
@@ -28,6 +29,7 @@ function Histogram( image, x, y, w, h )
 		buffer.drawImage( image,x, y, w, h, x, y, w, h);
 		imgData = buffer.getImageData( x, y, w, h );
 		
+			
 		//fill them with data
 		for( var i = 0, l = imgData.data.length; i < l; i+=4 )
 		{

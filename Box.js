@@ -1,16 +1,18 @@
-//GLOBAL VARIABLES
+ //GLOBAL VARIABLES
 var AREA_POWER = 0.25;
 var drawLines = false;
+var drawHatches = true;
+var hatchShading = false;
 
 function Box( image, parent, x, y, w, h, depth )
-{
+{	
 	this.parent = parent;
 	this.image = image;
 	this.x = x;
 	this.y = y;
 	this.w = w;
 	this.h = h;
-	this.depth = depth;	
+	this.depth = depth;
 	this.children = [];
 	this.hist = new Histogram( image, x, y, w, h );		
 	this.setColor( this.hist.averageColor() );
@@ -99,14 +101,62 @@ Box.prototype.divide = function()
 **/
 Box.prototype.draw = function( ctx )
 {
-	ctx.fillStyle = this.color;
-	ctx.fillRect( this.x, this.y, this.w, this.h );	
-
+	
+	if( drawHatches )
+	{
+		if( hatchShading )
+		{
+			ctx.fillStyle = this.color;
+			ctx.globalAlpha = 0.2;
+			ctx.fillRect( this.x, this.y, this.w, this.h );
+			ctx.globalAlpha = 1;
+		}			
+		
+		var divisions = 10 / this.depth;
+		
+		var vHatches = this.w / divisions;
+		var hHatches = this.h / divisions;
+		
+		ctx.lineWidth="1";
+		
+		var thickestLineWidth = 4;
+		var widthOfLine = Math.tan( Math.atan( thickestLineWidth / MAX_DEPTH ) )* ( MAX_DEPTH - this.depth);
+		ctx.lineWidth=widthOfLine;		
+		
+		ctx.strokeStyle = this.color;
+		
+		for( var i = 0; i < divisions; i++ )
+		{			
+			ctx.beginPath();	
+			//Verticle hatches
+			ctx.moveTo(this.x+ i*vHatches, this.y);
+			ctx.lineTo(this.x+ i*vHatches, this.y+ this.h);
+			//Horizontal hatches
+			ctx.moveTo(this.x, this.y+ i*hHatches);
+			ctx.lineTo(this.x + this.w, this.y+ i*hHatches);
+			
+			ctx.stroke();
+		}
+		
+		
+		for( var i = 0; i < divisions; i++ )
+		{
+			ctx.beginPath();
+			
+			ctx.stroke();
+		}
+	}
+	else
+	{
+		ctx.fillStyle = this.color;
+		ctx.fillRect( this.x, this.y, this.w, this.h );
+	}
+	
 	if( drawLines )
 	{
 		ctx.beginPath();
-		ctx.lineWidth="1";
-		ctx.strokeStyle= "black";
+		ctx.lineWidth="0.1";
+		ctx.strokeStyle= "black";//this.color;
 		ctx.rect( this.x, this.y, this.w, this.h );
 		ctx.stroke();
 	}

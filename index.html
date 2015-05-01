@@ -3,67 +3,53 @@
 		<script type="text/javascript" src="quandrants.js"></script>
 		<script type="text/javascript" src="Box.js"></script>
 		<script type="text/javascript" src="Histogram.js"></script>
-		
 	</head>
-	<body>
-		
+	<body>		
+		<!--
 		<form>
 			<span>load image</span>
 			<input type="text" value="" id="imagename"/>
 			<input type="button" id="btn" value="GO" />
 		</form>
-		
+		-->		
 	
 		<div id="buttons">
 			<button id="playButton"  onclick="play()">Play</button>
 			<button id="pauseButton" onclick="step()">Step</button>
 			<button id="stopButton"  onclick="stop()">Stop</button>
+			<button id="createButton" onclick="create()">Convert to Picture</button>
+			<p id="saveMe" style="display:none;"> Right click to save me! </p>
 		</div>
 		
 		<div id="display">
 			<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
 				<p>Your browser doesn't support canvas.</p>
-			</canvas>
-			
-			<img id="refpix" src="fb.jpg" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;" /> //Mario.jpg
+			</canvas>			
+			<img id="refpix" onload="loadAll()" src="pix/me.jpg" style="display:none;border:1px solid #000000;margin: 5px;" />
 		</div>
 		
-		<script type="text/javascript">
-			
-			document.getElementById('btn').onclick = function() 
-			{
-				var val = document.getElementById('imagename').value,
-					src = val;            
-				var pix = document.getElementById('refpix');
-				
-				pix.onload = function()
-				{
-					quads.initialize( picture.src );
-				}
-				pix.src = src;
-				
-			}
-		</script>
-		
 		<script>
-			var picture = document.getElementById('refpix');
-			var canvas = document.getElementById("canvas");
-			var ctx = canvas.getContext("2d");
-			var quads = new quandrants( canvas, canvas.width, canvas.height);
-			quads.initialize( picture.src ); //fb.jpg
-						
-			canvas.oncontextmenu = function (e) {
-				e.preventDefault();
-			};	
-			
-			function log( str )
+			var quads;
+			function loadAll()
 			{
-				console.log( str );
-			};
+				var picture = document.getElementById('refpix');
+				var canvas = document.getElementById("canvas");
+				canvas.oncontextmenu = function (e) {
+					e.preventDefault();
+				};
+				canvas.width = picture.naturalWidth;
+				canvas.height = picture.naturalHeight;
+				quads = new quandrants( canvas );
+				quads.initialize( picture ); //fb.jpg				
+			}			
 			
 			function play()
 			{
 				console.log( "Program Started");
+				if( ITERATIONS == 0 )
+				{
+					ITERATIONS += 1000;
+				}
 				quads.play();
 				
 			};
@@ -78,8 +64,38 @@
 			{
 				quads.step();
 				console.log( "Program Stepped");
+			};
+			
+			function create()
+			{
+				quads.stop();
+				playButton.style.display   = 'none';
+				stopButton.style.display   = 'none';
+				pauseButton.style.display  = 'none';
+				createButton.style.display = 'none';
+				
+				var dataUrl = canvas.toDataURL();
+				var img = document.getElementById('refpix');
+				img.src = dataUrl;
+				canvas.style.display = 'none';
+				saveMe.style.display = "block";
+				img.style.display = "block";
+			};
+			
+			/*
+			document.getElementById('btn').onclick = function() 
+			{
+				var val = document.getElementById('imagename').value;
+				var pix = document.getElementById('refpix');				
+				pix.onload = function()
+				{
+					quads.initialize( picture.src );
+				}
+				pix.src = val;
 			}
+			*/
 			
 		</script>
+		
 	</body>
 </html>

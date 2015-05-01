@@ -1,11 +1,10 @@
 //GLOBAL VARIABLES
-var ITERATIONS = 1000;
-var MAX_DEPTH = 7;
+ITERATIONS = 1024;
+MAX_DEPTH = 8;
 
+//Class public vars
 var ERROR_RATE = .5;
 var DEBUG_MODE = false;
-
-
 
 //The Image data
 var g_image = new Image();
@@ -19,8 +18,7 @@ var ctx;
 var bufferCanvas = document.createElement('canvas');
 var buffer = bufferCanvas.getContext('2d');
 
-
-function quandrants( passed_canvas,cWidth ,cHeight)
+function quandrants( passed_canvas )
 {
 	//Initialize the drawing canvas and context for main canvas and buffer
 	canvas = passed_canvas;
@@ -45,21 +43,23 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 	
 	this.initialize = function( img )
 	{	
-		g_image = new Image();
-		g_image.onload = function()
-		{	
-			g_imageData = ctx.getImageData(0,0,cWidth,cHeight);
-			console.log( g_imageData);
-			isRunning = true;
+		g_image = img;
+		ctx.drawImage( g_image, 0, 0, g_image.width, g_image.height);//, 0, 0, canvas.width, canvas.height);
+		g_imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+		ctx.clearRect( 0, 0, canvas.width, canvas.height);
+		isRunning = true;
 			
-			root = new Box( g_image, {},  0, 0, cWidth, cHeight, 0 );
-			errorSum = root.error * root.area();
-			drawNode = root;
-			boxes.push( root );
-			draw();			
-		}
-		g_image.src = img ;
+		root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0 );
+		errorSum = root.error * root.area();
+		drawNode = root;
+		boxes.push( root );
+		draw();	
 		
+	}
+	
+	this.Running = function()
+	{
+		return isRunning;
 	}
 	
 	this.play = function()
@@ -126,7 +126,6 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 		
 		error = averageErrorOfQuad( drawNode, errorSum );
 		
-		console.log("prev: " + previousError + "error: " + error);
 		if( previousError == -1 || previousError - error > ERROR_RATE )
 			previousError = error;
 		
@@ -158,7 +157,6 @@ function quandrants( passed_canvas,cWidth ,cHeight)
 	
 	function getBoxWithLargestError( box )
 	{
-		console.log( 'box error: ' + box.error + ' depth: ' + box.depth );
 		if( box.isLeaf() || box.depth >= MAX_DEPTH )
 		{			
 			return box;
