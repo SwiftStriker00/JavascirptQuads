@@ -13,11 +13,10 @@ function Histogram( image, x, y, w, h )
 	var b = [];
 	
 	buildHist();	
+	
 	/**
 	* Builds the Histogram from the given image data
 	**/
-
-	
 	function buildHist()
 	{
 		//first initialize r, g, and b
@@ -29,7 +28,6 @@ function Histogram( image, x, y, w, h )
 		buffer.drawImage( image,x, y, w, h, x, y, w, h);
 		imgData = buffer.getImageData( x, y, w, h );
 		
-			
 		//fill them with data
 		for( var i = 0, l = imgData.data.length; i < l; i+=4 )
 		{
@@ -61,8 +59,7 @@ function Histogram( image, x, y, w, h )
 			array[i++] = val;
 		}
 		return array;
-	}
-	
+	}	
 
 	/**
 	* Returns the weighted average of a set of data of a color channel histogram
@@ -86,8 +83,7 @@ function Histogram( image, x, y, w, h )
 		
 		return { value: value, error: error };
 	};
-	
-	
+		
 	/**
 	* The weighted average of colors 
 	**/

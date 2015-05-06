@@ -12,6 +12,21 @@
 			<input type="button" id="btn" value="GO" />
 		</form>
 		-->		
+		<script type="text/javascript">
+		function loadAll()
+			{
+				var picture = document.getElementById('refpix');
+				var canvas = document.getElementById("canvas");
+				canvas.oncontextmenu = function (e) {
+					e.preventDefault();
+				};
+				canvas.width = picture.naturalWidth;
+				canvas.height = picture.naturalHeight;
+				
+				quads = new quandrants( canvas );
+				quads.initialize( picture ); //fb.jpg				
+			}
+		</script>
 	
 		<div id="buttons">
 			<button id="playButton"  onclick="play()">Play</button>
@@ -25,23 +40,12 @@
 			<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
 				<p>Your browser doesn't support canvas.</p>
 			</canvas>			
-			<img id="refpix" onload="loadAll()" src="pix/me.jpg" style="display:none;border:1px solid #000000;margin: 5px;" />
+			<img id="refpix" onload="loadAll()" src="me.jpg" style="display:none;border:1px solid #000000;margin: 5px;" />
 		</div>
 		
 		<script>
 			var quads;
-			function loadAll()
-			{
-				var picture = document.getElementById('refpix');
-				var canvas = document.getElementById("canvas");
-				canvas.oncontextmenu = function (e) {
-					e.preventDefault();
-				};
-				canvas.width = picture.naturalWidth;
-				canvas.height = picture.naturalHeight;
-				quads = new quandrants( canvas );
-				quads.initialize( picture ); //fb.jpg				
-			}			
+						
 			
 			function play()
 			{

@@ -1,8 +1,15 @@
  //GLOBAL VARIABLES
 var AREA_POWER = 0.25;
-var drawLines = false;
-var drawHatches = true;
-var hatchShading = false;
+var MAX_DIVISIONS = 10;
+var MAX_LINE_WIDTH = 4;
+
+DrawMode ={ 
+	BOX: "Box", 
+	BOXBORDER: "BoxBorder", 
+	HATCH: "Hatch",
+	HATCHSHADE: "HatchShaded"
+};
+
 
 function Box( image, parent, x, y, w, h, depth )
 {	
@@ -17,6 +24,7 @@ function Box( image, parent, x, y, w, h, depth )
 	this.hist = new Histogram( image, x, y, w, h );		
 	this.setColor( this.hist.averageColor() );
 	this.score = -this.error * Math.pow( this.area(), AREA_POWER );
+	this.mode = DrawMode.HATCHSHADE;
 };
 
 /**
@@ -101,7 +109,58 @@ Box.prototype.divide = function()
 **/
 Box.prototype.draw = function( ctx )
 {
+	ctx.fillStyle = this.color;	
 	
+	switch( this.mode )
+	{		
+		case DrawMode.BOXBORDER:
+			ctx.beginPath();
+			ctx.lineWidth="0.1";
+			ctx.strokeStyle= "black";//this.color;
+			ctx.rect( this.x, this.y, this.w, this.h );
+			ctx.stroke();
+		case DrawMode.BOX:
+			ctx.fillRect( this.x, this.y, this.w, this.h );			
+			break;
+		case DrawMode.HATCHSHADE:
+			ctx.globalAlpha = 0.2;
+			ctx.fillRect( this.x, this.y, this.w, this.h );
+			ctx.globalAlpha = 1;
+		case DrawMode.HATCH:
+			//determine the number of hatches in a square
+			var divisions = MAX_DIVISIONS / (this.depth + 1);		
+			var vHatches = this.w / divisions;
+			var hHatches = this.h / divisions;
+			
+			//The deeper we go, the finer our hatches become		
+			ctx.lineWidth = Math.tan( Math.atan( MAX_LINE_WIDTH / MAX_DEPTH ) )* ( MAX_DEPTH - this.depth);	
+			ctx.strokeStyle = this.color;
+			
+			ctx.beginPath();	
+			for( var i = 0; i < divisions; i++ )
+			{			
+				
+				//Verticle hatches
+				ctx.moveTo(this.x+ i*vHatches, this.y);
+				ctx.lineTo(this.x+ i*vHatches, this.y+ this.h);
+				//Horizontal hatches
+				ctx.moveTo(this.x, this.y+ i*hHatches);
+				ctx.lineTo(this.x + this.w, this.y+ i*hHatches);
+				
+				
+			}
+			ctx.stroke();
+			
+			for( var i = 0; i < divisions; i++ )
+			{
+				ctx.beginPath();
+				
+				ctx.stroke();
+			}
+			break;
+	}
+	
+	/*
 	if( drawHatches )
 	{
 		if( hatchShading )
@@ -167,7 +226,7 @@ Box.prototype.draw = function( ctx )
 		ctx.stroke();
 		ctx.fillStyle = "#000";
 		ctx.fillText("e:" + Math.floor(this.error), this.x+5, this.y+15 );
-	}
+	}*/
 };
 
 /**

@@ -40,21 +40,29 @@ function quandrants( passed_canvas )
 	var previousError = -1;
 	var error = 0;
 	var errorSum;
-	
+	/**
+	* Initializes the image on the screen
+	**/
 	this.initialize = function( img )
 	{	
-		g_image = img;
-		ctx.drawImage( g_image, 0, 0, g_image.width, g_image.height);//, 0, 0, canvas.width, canvas.height);
-		g_imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
-		ctx.clearRect( 0, 0, canvas.width, canvas.height);
-		isRunning = true;
+		g_image = new Image();// = img;
+		g_image.onload = function()
+		{			
+			//Draw original image to get image data
+			ctx.drawImage( g_image, 0, 0, g_image.width, g_image.height);//, 0, 0, canvas.width, canvas.height);
+			g_imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
+			ctx.clearRect( 0, 0, canvas.width, canvas.height);
 			
-		root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0 );
-		errorSum = root.error * root.area();
-		drawNode = root;
-		boxes.push( root );
-		draw();	
-		
+			//Create the starting root node
+			root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0 );
+			errorSum = root.error * root.area();
+			
+			//Initial Draw
+			drawNode = root;
+			boxes.push( root );
+			draw();	
+		}
+		g_image.src = img.src;
 	}
 	
 	this.Running = function()
@@ -176,16 +184,13 @@ function quandrants( passed_canvas )
 	*	Game loop draw function
 	**/
 	function draw()
-	{
-		/* Since we are overlaying with sub sections, we don't actually need to clear base images
-		ctx.fillStyle = "#fff";
-		ctx.clearRect(0,0,cWidth,cHeight);*/
-		
+	{		
 		drawNode.draw(ctx);
 		for( var i = 0; i < drawNode.children.length; i++ )
 		{
 			drawNode.children[i].draw(ctx);
 		}
+		return;
 	}
 	
 	/**
