@@ -3,16 +3,18 @@ var AREA_POWER = 0.25;
 var MAX_DIVISIONS = 10;
 var MAX_LINE_WIDTH = 4;
 
-DrawMode ={ 
-	BOX: "Box", 
-	BOXBORDER: "BoxBorder", 
-	HATCH: "Hatch",
-	HATCHSHADE: "HatchShaded"
+DrawMode = {
+	BOX:		"Box",
+	BOXBORDER: 	"BoxBorder",
+	HATCH:		"Hatch",
+	HATCHSHADE:	"HatchShaded"
 };
 
-
+/**
+*	Box constructor
+**/
 function Box( image, parent, x, y, w, h, depth )
-{	
+{
 	this.parent = parent;
 	this.image = image;
 	this.x = x;
@@ -20,12 +22,13 @@ function Box( image, parent, x, y, w, h, depth )
 	this.w = w;
 	this.h = h;
 	this.depth = depth;
+	this.hatchWidth =  Math.tan( Math.atan( MAX_LINE_WIDTH / MAX_DEPTH ) )* ( MAX_DEPTH - this.depth);
 	this.children = [];
-	this.hist = new Histogram( image, x, y, w, h );		
+	this.hist = new Histogram( image, x, y, w, h );
 	this.setColor( this.hist.averageColor() );
 	this.score = -this.error * Math.pow( this.area(), AREA_POWER );
 	this.mode = DrawMode.HATCHSHADE;
-};
+}
 
 /**
 * Determines if there are no children to this node
@@ -33,7 +36,9 @@ function Box( image, parent, x, y, w, h, depth )
 Box.prototype.isLeaf = function()
 {
 	if( this.children.length === 0 )
+	{
 		return true;
+	}
 	return false;
 };
 
@@ -43,17 +48,22 @@ Box.prototype.isLeaf = function()
 Box.prototype.getLeafNodes = function()
 {
 	if( this.children === [] )
+	{
 		return [ this ];
+	}
 	else
+	{
 		return this.children;
+	}
 };
 
 Box.prototype.getAllLeafNodes = function( currentlist, maxdepth )
 {
 	if( this.depth >= maxdepth )
 	{
-		
-	}else if( this.isLeaf() )
+
+	}
+	else if( this.isLeaf() )
 	{
 		currentlist.push( this );
 	}
@@ -62,10 +72,10 @@ Box.prototype.getAllLeafNodes = function( currentlist, maxdepth )
 		for( var i = 0; i < this.children.length; i++ )
 		{
 			currentlist = this.children[i].getAllLeafNodes( currentlist, maxdepth );
-		}		
+		}
 	}
 	return currentlist;
-}
+};
 
 /**
 * Gets the children nodes to this box up to a maximum depth given
@@ -74,7 +84,6 @@ Box.prototype.getLeafNodes = function( depth )
 {
 	if( this.depth >= depth )
 	{
-		//this.error = 0;
 		return [ this ];
 	}
 	else if( this.children === [])
@@ -85,14 +94,14 @@ Box.prototype.getLeafNodes = function( depth )
 	{
 		return this.children;
 	}
-}
+};
 
 /**
 * Generate children nodes for this box
 **/
 Box.prototype.divide = function()
-{	
-	
+{
+
 	var w2 = this.w / 2;
 	var h2 = this.h / 2;
 
@@ -103,130 +112,66 @@ Box.prototype.divide = function()
 
 	this.children =[ q1, q2, q3, q4 ];
 };
-	
+
 /**
 * Draw the box's current color and if enabled, a border
 **/
 Box.prototype.draw = function( ctx )
 {
-	ctx.fillStyle = this.color;	
-	
+	ctx.fillStyle = this.color;
+
 	switch( this.mode )
-	{		
+	{
 		case DrawMode.BOXBORDER:
 			ctx.beginPath();
 			ctx.lineWidth="0.1";
 			ctx.strokeStyle= "black";//this.color;
 			ctx.rect( this.x, this.y, this.w, this.h );
 			ctx.stroke();
+		/* falls through */
 		case DrawMode.BOX:
-			ctx.fillRect( this.x, this.y, this.w, this.h );			
+			ctx.fillRect( this.x, this.y, this.w, this.h );
 			break;
 		case DrawMode.HATCHSHADE:
 			ctx.globalAlpha = 0.2;
 			ctx.fillRect( this.x, this.y, this.w, this.h );
 			ctx.globalAlpha = 1;
+		/* falls through */
 		case DrawMode.HATCH:
 			//determine the number of hatches in a square
-			var divisions = MAX_DIVISIONS / (this.depth + 1);		
+			var divisions = MAX_DIVISIONS / (this.depth + 1);
 			var vHatches = this.w / divisions;
 			var hHatches = this.h / divisions;
-			
-			//The deeper we go, the finer our hatches become		
-			ctx.lineWidth = Math.tan( Math.atan( MAX_LINE_WIDTH / MAX_DEPTH ) )* ( MAX_DEPTH - this.depth);	
+
+			//The deeper we go, the finer our hatches become
+			ctx.lineWidth = this.hatchWidth;
 			ctx.strokeStyle = this.color;
-			
-			ctx.beginPath();	
-			for( var i = 0; i < divisions; i++ )
-			{			
-				
+
+			ctx.beginPath();
+
+
+			var i = 0;
+			for( i = 0; i < divisions; i++ )
+			{
 				//Verticle hatches
 				ctx.moveTo(this.x+ i*vHatches, this.y);
 				ctx.lineTo(this.x+ i*vHatches, this.y+ this.h);
+
 				//Horizontal hatches
 				ctx.moveTo(this.x, this.y+ i*hHatches);
 				ctx.lineTo(this.x + this.w, this.y+ i*hHatches);
-				
-				
+
 			}
 			ctx.stroke();
-			
-			for( var i = 0; i < divisions; i++ )
+
+			for( i = 0; i < divisions; i++ )
 			{
 				ctx.beginPath();
-				
 				ctx.stroke();
 			}
 			break;
 	}
-	
-	/*
-	if( drawHatches )
-	{
-		if( hatchShading )
-		{
-			ctx.fillStyle = this.color;
-			ctx.globalAlpha = 0.2;
-			ctx.fillRect( this.x, this.y, this.w, this.h );
-			ctx.globalAlpha = 1;
-		}			
-		
-		var divisions = 10 / this.depth;
-		
-		var vHatches = this.w / divisions;
-		var hHatches = this.h / divisions;
-		
-		ctx.lineWidth="1";
-		
-		var thickestLineWidth = 4;
-		var widthOfLine = Math.tan( Math.atan( thickestLineWidth / MAX_DEPTH ) )* ( MAX_DEPTH - this.depth);
-		ctx.lineWidth=widthOfLine;		
-		
-		ctx.strokeStyle = this.color;
-		
-		for( var i = 0; i < divisions; i++ )
-		{			
-			ctx.beginPath();	
-			//Verticle hatches
-			ctx.moveTo(this.x+ i*vHatches, this.y);
-			ctx.lineTo(this.x+ i*vHatches, this.y+ this.h);
-			//Horizontal hatches
-			ctx.moveTo(this.x, this.y+ i*hHatches);
-			ctx.lineTo(this.x + this.w, this.y+ i*hHatches);
-			
-			ctx.stroke();
-		}
-		
-		
-		for( var i = 0; i < divisions; i++ )
-		{
-			ctx.beginPath();
-			
-			ctx.stroke();
-		}
-	}
-	else
-	{
-		ctx.fillStyle = this.color;
-		ctx.fillRect( this.x, this.y, this.w, this.h );
-	}
-	
-	if( drawLines )
-	{
-		ctx.beginPath();
-		ctx.lineWidth="0.1";
-		ctx.strokeStyle= "black";//this.color;
-		ctx.rect( this.x, this.y, this.w, this.h );
-		ctx.stroke();
-	}
-	
-	//Debug code, remove
-	if( DEBUG_MODE )
-	{
-		ctx.stroke();
-		ctx.fillStyle = "#000";
-		ctx.fillText("e:" + Math.floor(this.error), this.x+5, this.y+15 );
-	}*/
+
 };
 
 /**

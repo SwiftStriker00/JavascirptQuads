@@ -4,14 +4,14 @@
 		<script type="text/javascript" src="Box.js"></script>
 		<script type="text/javascript" src="Histogram.js"></script>
 	</head>
-	<body>		
+	<body>
 		<!--
 		<form>
 			<span>load image</span>
 			<input type="text" value="" id="imagename"/>
 			<input type="button" id="btn" value="GO" />
 		</form>
-		-->		
+		-->
 		<script type="text/javascript">
 		function loadAll()
 			{
@@ -22,31 +22,31 @@
 				};
 				canvas.width = picture.naturalWidth;
 				canvas.height = picture.naturalHeight;
-				
+
 				quads = new quandrants( canvas );
-				quads.initialize( picture ); //fb.jpg				
+				quads.initialize( picture ); //fb.jpg
 			}
 		</script>
-	
+
 		<div id="buttons">
-			<button id="playButton"  onclick="play()">Play</button>
-			<button id="pauseButton" onclick="step()">Step</button>
-			<button id="stopButton"  onclick="stop()">Stop</button>
+			<button id="playButton"   onclick="play()">Play</button>
+			<button id="pauseButton"  onclick="step()">Step</button>
+			<button id="stopButton"   onclick="stop()">Stop</button>
 			<button id="createButton" onclick="create()">Convert to Picture</button>
 			<p id="saveMe" style="display:none;"> Right click to save me! </p>
 		</div>
-		
+
 		<div id="display">
 			<canvas id="canvas" width="480px" height="650px" style="border:1px solid #000000;margin: 5px;"> <!--width="770px" height="500px" -->
 				<p>Your browser doesn't support canvas.</p>
-			</canvas>			
+			</canvas>
 			<img id="refpix" onload="loadAll()" src="pix/Mario.jpg" style="display:none;border:1px solid #000000;margin: 5px;" />
 		</div>
-		
+
 		<script>
 			var quads;
-						
-			
+
+
 			function play()
 			{
 				console.log( "Program Started");
@@ -55,21 +55,21 @@
 					ITERATIONS += 1000;
 				}
 				quads.play();
-				
+
 			};
-			
+
 			function stop()
 			{
 				quads.stop();
 				console.log( "Program Halted");
 			};
-			
+
 			function step()
 			{
 				quads.step();
 				console.log( "Program Stepped");
 			};
-			
+
 			function create()
 			{
 				quads.stop();
@@ -77,7 +77,7 @@
 				stopButton.style.display   = 'none';
 				pauseButton.style.display  = 'none';
 				createButton.style.display = 'none';
-				
+
 				var dataUrl = canvas.toDataURL();
 				var img = document.getElementById('refpix');
 				img.src = dataUrl;
@@ -85,12 +85,12 @@
 				saveMe.style.display = "block";
 				img.style.display = "block";
 			};
-			
+
 			/*
-			document.getElementById('btn').onclick = function() 
+			document.getElementById('btn').onclick = function()
 			{
 				var val = document.getElementById('imagename').value;
-				var pix = document.getElementById('refpix');				
+				var pix = document.getElementById('refpix');
 				pix.onload = function()
 				{
 					quads.initialize( picture.src );
@@ -98,8 +98,8 @@
 				pix.src = val;
 			}
 			*/
-			
+
 		</script>
-		
+
 	</body>
 </html>
