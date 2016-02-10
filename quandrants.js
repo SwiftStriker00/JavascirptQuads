@@ -57,6 +57,8 @@ function quandrants( passed_canvas )
 			root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0 );
 			errorSum = root.error * root.area();
 
+			document.getElementById("divisions").innerHTML = boxes.length;
+
 			//Initial Draw
 			drawNode = root;
 			boxes.push( root );
@@ -121,7 +123,6 @@ function quandrants( passed_canvas )
 	**/
 	function errorCompareTo( a, b )
 	{
-
 		if( a.score < b.score )
 		{
 			return -1;
@@ -148,7 +149,7 @@ function quandrants( passed_canvas )
 
 		var leaves = root.getAllLeafNodes( [], MAX_DEPTH );
 		leaves.sort( errorCompareTo );
-		var last = leaves[0];// leaves[leaves.length-1];
+		var last = leaves[0]; // leaves[leaves.length-1];
 		if( last.error > 0 )
 		{
 			last.divide();
@@ -163,7 +164,8 @@ function quandrants( passed_canvas )
 
 		drawNode = last;
 		boxes = leaves;
-
+		document.getElementById("divisions").innerHTML = boxes.length;
+		document.getElementById("iterationsleft").innerHTML = ITERATIONS;
 		ITERATIONS -= 1;
 	}
 
@@ -211,12 +213,13 @@ function quandrants( passed_canvas )
 	**/
 	function averageColorOfRegion( x, y, w, h )
 	{
+		var COLORBITS = 4;
 		var imgData = buffer.getImageData( x, y, w, h );
 		var total = imgData.data.length;
 		var R = 0, G = 0, B = 0;
 
 		//Manipulate the current section
-		for( var i = 0; i < total; i+= 4 )
+		for( var i = 0; i < total; i += COLORBITS )
 		{
 			//Index of RGBA
 			var r = i + 0,

@@ -27,7 +27,7 @@ function Box( image, parent, x, y, w, h, depth )
 	this.hist = new Histogram( image, x, y, w, h );
 	this.setColor( this.hist.averageColor() );
 	this.score = -this.error * Math.pow( this.area(), AREA_POWER );
-	this.mode = DrawMode.HATCHSHADE;
+	this.mode = DrawMode.BOX;
 }
 
 /**
