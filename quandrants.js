@@ -2,9 +2,16 @@
 ITERATIONS = 1024;
 MAX_DEPTH = 8;
 
+DrawMode = {
+	BOX:		"Box",
+	BOXBORDER: 	"BoxBorder",
+	HATCH:		"Hatch",
+	HATCHSHADE:	"HatchShaded"
+};
+
 //Class public vars
 var ERROR_RATE = 0.5;
-var DEBUG_MODE = false;
+var DEBUG_MODE = true;
 
 //The Image data
 var g_image = new Image();
@@ -31,21 +38,45 @@ function quandrants( passed_canvas )
 	var framerate 	= 20; //60
 	var isRunning 	= false;
 
-	var boxes = [];
-	var root;
-	var drawNode;
-	var hist;
-
-
-	var previousError = -1;
-	var error = 0;
-	var errorSum;
+	var root, 
+		drawNode, 
+		hist, 
+		boxes = [];
+	
+	var previousError,
+		error,
+		errorSum;	
+	
+	var drawShader = DrawMode.BOX;	
+	
 	/**
 	* Initializes the image on the screen
 	**/
-	this.initialize = function( img )
+	this.initialize = function( img, shader )
 	{
+		previousError = -1;
+		error = 0;
+		errorSum = 0;
+		switch( shader )
+		{
+			case "Box":
+				drawShader = DrawMode.BOX;
+				break;
+			case "BoxBorder":
+				drawShader = DrawMode.BOXBORDER;
+				break;
+			case "Hatch":
+				drawShader = DrawMode.HATCH;
+				break;
+			case "HatchShaded":
+				drawShader = DrawMode.HATCHSHADE;
+				break;
+		}
+
+		
+		
 		g_image = new Image();// = img;
+		g_image.crossOrigin = "Anonymous";
 		g_image.onload = function()
 		{
 			//Draw original image to get image data
@@ -54,7 +85,8 @@ function quandrants( passed_canvas )
 			ctx.clearRect( 0, 0, canvas.width, canvas.height);
 
 			//Create the starting root node
-			root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0 );
+			root = new Box( g_image, {},  0, 0, canvas.width, canvas.height, 0, drawShader );
+			root.shader = 
 			errorSum = root.error * root.area();
 
 			//Initial Draw
