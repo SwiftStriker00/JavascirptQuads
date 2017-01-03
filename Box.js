@@ -3,17 +3,10 @@ var AREA_POWER = 0.25;
 var MAX_DIVISIONS = 10;
 var MAX_LINE_WIDTH = 4;
 
-DrawMode = {
-	BOX:		"Box",
-	BOXBORDER: 	"BoxBorder",
-	HATCH:		"Hatch",
-	HATCHSHADE:	"HatchShaded"
-};
-
 /**
 *	Box constructor
 **/
-function Box( image, parent, x, y, w, h, depth )
+function Box( image, parent, x, y, w, h, depth, shader )
 {
 	this.parent = parent;
 	this.image = image;
@@ -27,7 +20,7 @@ function Box( image, parent, x, y, w, h, depth )
 	this.hist = new Histogram( image, x, y, w, h );
 	this.setColor( this.hist.averageColor() );
 	this.score = -this.error * Math.pow( this.area(), AREA_POWER );
-	this.mode = DrawMode.HATCHSHADE;
+	this.mode = shader;
 }
 
 /**
@@ -105,10 +98,10 @@ Box.prototype.divide = function()
 	var w2 = this.w / 2;
 	var h2 = this.h / 2;
 
-	var q1 = new Box(this.image, this, this.x, 	    this.y, 	 w2, h2, this.depth+1 );
-	var q2 = new Box(this.image, this, this.x + w2, this.y, 	 w2, h2, this.depth+1 );
-	var q3 = new Box(this.image, this, this.x, 	    this.y + h2, w2, h2, this.depth+1 );
-	var q4 = new Box(this.image, this, this.x + w2, this.y + h2, w2, h2, this.depth+1 );
+	var q1 = new Box(this.image, this, this.x, 	    this.y, 	 w2, h2, this.depth+1, this.mode );
+	var q2 = new Box(this.image, this, this.x + w2, this.y, 	 w2, h2, this.depth+1, this.mode );
+	var q3 = new Box(this.image, this, this.x, 	    this.y + h2, w2, h2, this.depth+1, this.mode );
+	var q4 = new Box(this.image, this, this.x + w2, this.y + h2, w2, h2, this.depth+1, this.mode );
 
 	this.children =[ q1, q2, q3, q4 ];
 };
